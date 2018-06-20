@@ -17,6 +17,7 @@ public class EnemiesAttributeUpdater : MonoBehaviour {
         if (attributes.libido < 300)
         {
             attributes.libido++;
+            //Debug.Log(attributes.persona.LibidoGain);
             if (attributes.persona.LibidoGain > 0 && (attributes.libido + attributes.persona.LibidoGain) < 300) { //
                 attributes.libido += attributes.persona.LibidoGain;
             }
@@ -33,14 +34,14 @@ public class EnemiesAttributeUpdater : MonoBehaviour {
         {
             attributes.hungry--;
 
-            /*if (attributes.persona.HungryGain > 0 && (attributes.hungry - attributes.persona.HungryGain) > 0)
+            if (attributes.persona.HungryGain > 0 && (attributes.hungry - attributes.persona.HungryGain) > 0)
             { //
                 attributes.hungry -= attributes.persona.HungryGain;
             }
             else if (attributes.persona.HungryGain > 0 && (attributes.hungry - attributes.persona.HungryGain) <= 0)
             {
                 attributes.hungry = 0;
-            }*/
+            }
         }
         else if (attributes.life > 0)
         {

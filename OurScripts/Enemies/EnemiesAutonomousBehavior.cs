@@ -52,8 +52,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
         sprite = gameObject.GetComponent<SpriteRenderer>();
         species = gameObject.transform.parent.GetComponent<EnemiesGlobalAttributes>().species;
         globalAttributes = gameObject.transform.parent.gameObject.GetComponent<EnemiesGlobalAttributes>();
-        persona = new Persona(globalAttributes.persona);//gameObject.transform.parent.gameObject.GetComponent<Persona>();
-        //Debug.Log(persona.ToString());
+        persona = globalAttributes.persona;
         StartCoroutine(SetAgentOffset(1));
     }
 
@@ -482,12 +481,12 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
     {
         if (attributes.libido >= 300)
         {
-            GameObject activeCreature = GameObject.Find("Enemies" + (species + 2) % 3 + "/" + character).gameObject;
+            GameObject activeCreature = GameObject.Find("Enemies" + globalAttributes.indice+ "/" + character).gameObject;
+            
             Vector3 childPosition = new Vector3();
             Vector3 childRotation;
             Vector3 childScale;
             childPosition.x = activeCreature.transform.position.x + 7;//
-            childPosition.y = activeCreature.transform.position.x + 3;
             childPosition.z = activeCreature.transform.position.z + 7;//
             childRotation.x = 0;
             childRotation.y = 0;
@@ -495,14 +494,11 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             childScale.x = 5;
             childScale.y = 5;
             childScale.z = 1;
-            Debug.Log(species+" "+(species+2)%3);
-            GameObject creaturesNode = GameObject.Find/*("Enemies" + species + "/");*/("EnemiesCreatures/Enemies" + (species+2)%3 + "/");
+            GameObject creaturesNode = GameObject.Find("EnemiesCreatures/Enemies" + globalAttributes.indice + "/");
             int lastCreatureName = int.Parse(creaturesNode.transform.GetChild(creaturesNode.transform.childCount - 1).name);
             GameObject childObject = new GameObject((lastCreatureName + 1).ToString());
 
             SpriteRenderer spriteRenderer = childObject.AddComponent<SpriteRenderer>();
-            //Sprite creatureSprite = Resources.Load<Sprite>("species_" + PlayerInfo.selectedSpecies.ToString() + "_default");
-            //childSprite.sprite = creatureSprite;
 
             Animator childAnimator = childObject.AddComponent<Animator>();
             childAnimator.runtimeAnimatorController = Resources.Load("playerSpeciesController") as RuntimeAnimatorController;
@@ -514,7 +510,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             childAnimator.SetInteger("combatUpgrade", Mathf.Max(attributes.attackUpgrade, attributes.deffenseUpgrade));
 
 
-            childObject.transform.parent = GameObject.Find("EnemiesCreatures/Enemies" + (species + 2) % 3 + "/").transform;
+            childObject.transform.parent = GameObject.Find("EnemiesCreatures/Enemies" + globalAttributes.indice + "/").transform;
             childObject.transform.rotation = Quaternion.Euler(childRotation);
             childObject.transform.localScale = childScale;
             BoxCollider childBox = childObject.AddComponent<BoxCollider>();
@@ -539,37 +535,41 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             childRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
             childObject.tag = "EnemySpecies";
             Terrain terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
-            childPosition.y = terrain.SampleHeight(childPosition) + 12;
+            childPosition.y = terrain.SampleHeight(childPosition) +40;
             childObject.transform.position = childPosition;
 
-            NavMeshObstacle obstacle = childObject.AddComponent<NavMeshObstacle>();
-            obstacle.center = new Vector3(0f, 0f, 0f);
-            obstacle.size = new Vector3(1f, 1f, 4.1f);
-            obstacle.carving = true;
-            obstacle.enabled = true;
-            NavMeshAgent agent = childObject.AddComponent<NavMeshAgent>();
-            agent.radius = 0.53f;
-            agent.height = 1;
-            agent.speed = (6.0f + attributes.movementUpgrade * 3) * GameConstants.movementSpeed;
-            agent.angularSpeed = 120;
-            agent.acceleration = 99;
-            agent.stoppingDistance = 0;
-            agent.autoBraking = true;
-            agent.avoidancePriority = 50;
-            agent.autoTraverseOffMeshLink = true;
-            agent.autoRepath = true;
-            agent.areaMask = 1;
-            agent.enabled = false;
-
-
+            Debug.Log("(x,y,z) = "+ childObject.transform.position.x+ " " + childObject.transform.position.y+" "+ childObject.transform.position.z+" "+ terrain.SampleHeight(childPosition));
+            
+            childObject.transform.parent.gameObject.GetComponent<EnemiesGlobalAttributes>(); 
             EnemiesAttributes childAttributes = childObject.AddComponent<EnemiesAttributes>();
             childAttributes.movementUpgrade = attributes.movementUpgrade;
             childAttributes.perceptionUpgrade = attributes.perceptionUpgrade;
             childAttributes.attackUpgrade = attributes.attackUpgrade;
             childAttributes.deffenseUpgrade = attributes.deffenseUpgrade;
-            Debug.Log("Enemy newborn generated:\nSpecies - " + (species + 2) % 3 + ";\nPersona - " + persona.Nome + ";");
+
+            NavMeshObstacle obstacleC = childObject.AddComponent<NavMeshObstacle>();
+            obstacleC.center = new Vector3(0f, 0f, 0f);
+            obstacleC.size = new Vector3(1f, 1f, 4.1f);
+            obstacleC.carving = true;
+            obstacleC.enabled = true;
+            NavMeshAgent agentC = childObject.AddComponent<NavMeshAgent>();
+            agentC.radius = 0.53f;
+            agentC.height = 1;
+            agentC.speed = (6.0f + childAttributes.movementUpgrade * 3) * GameConstants.movementSpeed;
+            agentC.angularSpeed = 120;
+            agentC.acceleration = 99;
+            agentC.stoppingDistance = 0;
+            agentC.autoBraking = true;
+            agentC.avoidancePriority = 50;
+            agentC.autoTraverseOffMeshLink = true;
+            agentC.autoRepath = true;
+            agentC.areaMask = 1;
+            agentC.enabled = false;
+
+            Debug.Log("Enemy newborn generated:\nIndice - "+ globalAttributes.indice+"\nSpecies - " + species+ ";\nPersona - " + persona.Nome + ";");
+
             childObject.AddComponent<EnemiesAttributeUpdater>();
-            //childObject.AddComponent<CharacterMovement>();
+            childObject.AddComponent<EnemiesCharacterMovement>();
             childObject.AddComponent<FixRotation>();
             childObject.AddComponent<EnemiesAutonomousBehavior>();
 
@@ -613,9 +613,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
         angryPosition.y = gameObject.transform.position.y + gameObject.GetComponent<BoxCollider>().size.y + 1;
         angryPosition.z = gameObject.transform.position.z;
         angrySprite.transform.position = angryPosition;
-
-        Debug.Log(persona.ToString());
-
+        
         if (enemyOb.tag == "ControllableSpecies")
         {
             enemyOb.GetComponent<PlayerAutonomousBehavior>().hitByEnemy++;
@@ -896,8 +894,8 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             else
             {
                 Vector3 newPosition = gameObject.transform.position;
-                newPosition.x = newPosition.x + walkSide * GameConstants.movementSpeed + persona.MoveSpeed + (walkSide * GameConstants.movementSpeed / 2 * attributes.movementUpgrade);
-                newPosition.z = newPosition.z + walkUp * GameConstants.movementSpeed + persona.MoveSpeed + (walkUp * GameConstants.movementSpeed / 2 * attributes.movementUpgrade);
+                newPosition.x = newPosition.x + walkSide * (GameConstants.movementSpeed + persona.MoveSpeed) + (walkSide * (GameConstants.movementSpeed + persona.MoveSpeed) / 2 * attributes.movementUpgrade);
+                newPosition.z = newPosition.z + walkUp * (GameConstants.movementSpeed + persona.MoveSpeed) + (walkUp * (GameConstants.movementSpeed + persona.MoveSpeed) / 2 * attributes.movementUpgrade);
 
                 /*if (walkSide > 0.0f)
                     {
