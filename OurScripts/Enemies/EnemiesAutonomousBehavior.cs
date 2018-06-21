@@ -479,7 +479,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
 
     void EnemyBreed()
     {
-        if (attributes.libido >= 300)
+        if (attributes.libido >= 200)
         {
             GameObject activeCreature = GameObject.Find("Enemies" + globalAttributes.indice+ "/" + character).gameObject;
             
@@ -538,7 +538,6 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             childPosition.y = terrain.SampleHeight(childPosition) +40;
             childObject.transform.position = childPosition;
 
-            Debug.Log("(x,y,z) = "+ childObject.transform.position.x+ " " + childObject.transform.position.y+" "+ childObject.transform.position.z+" "+ terrain.SampleHeight(childPosition));
             
             childObject.transform.parent.gameObject.GetComponent<EnemiesGlobalAttributes>(); 
             EnemiesAttributes childAttributes = childObject.AddComponent<EnemiesAttributes>();
@@ -626,6 +625,8 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             }
 
             enemyOb.GetComponent<SpeciesAttributes>().life -= damageDealt;
+            if (int.Parse(enemyOb.name) == PlayerInfo.selectedCreature)
+                Debug.Log("Life Reduced by "+damageDealt+" points\nCurrent Life "+ enemyOb.GetComponent<SpeciesAttributes>().life+" points");
         }
         else
         {
@@ -894,30 +895,33 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             else
             {
                 Vector3 newPosition = gameObject.transform.position;
-                newPosition.x = newPosition.x + walkSide * (GameConstants.movementSpeed + persona.MoveSpeed) + (walkSide * (GameConstants.movementSpeed + persona.MoveSpeed) / 2 * attributes.movementUpgrade);
-                newPosition.z = newPosition.z + walkUp * (GameConstants.movementSpeed + persona.MoveSpeed) + (walkUp * (GameConstants.movementSpeed + persona.MoveSpeed) / 2 * attributes.movementUpgrade);
+                newPosition.x = newPosition.x + walkSide * (GameConstants.movementSpeed ) + (walkSide * (GameConstants.movementSpeed) / 2 * attributes.movementUpgrade);
+                newPosition.z = newPosition.z + walkUp * (GameConstants.movementSpeed ) + (walkUp * (GameConstants.movementSpeed ) / 2 * attributes.movementUpgrade);
+
+                newPosition.x += walkSide * persona.MoveSpeed + (walkSide * persona.MoveSpeed / 2 * attributes.movementUpgrade); 
+                newPosition.z += walkUp * persona.MoveSpeed + (walkUp * persona.MoveSpeed / 2 * attributes.movementUpgrade);
 
                 /*if (walkSide > 0.0f)
                     {
-                        newPosition.x += persona.MoveSpeed;
+                        newPosition.x += walkSide * persona.MoveSpeed;
                     }
 
                 else if (walkSide < 0.0f)
                     {
-                        newPosition.x -= persona.MoveSpeed;
+                        newPosition.x += walkSide * persona.MoveSpeed;
                     }
 
 
                 if (walkUp > 0.0f)
                     {
-                        newPosition.z += persona.MoveSpeed;
+                        newPosition.z += walkUp * persona.MoveSpeed;
                     }
 
                 else if (walkUp < 0.0f)
                     {
-                        newPosition.z -= persona.MoveSpeed;
+                        newPosition.z += walkUp * persona.MoveSpeed;
                     }*/
-                
+
                 gameObject.transform.position = newPosition;
                 attributes.movementRemaining-= 1 - persona.FatigueGain;
             }
