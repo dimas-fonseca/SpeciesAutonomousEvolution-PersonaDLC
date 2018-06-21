@@ -572,7 +572,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
             childObject.AddComponent<FixRotation>();
             childObject.AddComponent<EnemiesAutonomousBehavior>();
 
-            attributes.libido -= 300;
+            attributes.libido = 0;
         }
     }
     IEnumerator RemoveAttackingEnemy(GameObject enemyCreatureHit)
