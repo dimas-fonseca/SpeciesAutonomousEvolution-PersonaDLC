@@ -46,7 +46,7 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
         InvokeRepeating("HuntForFood", randomStart, 1);
         InvokeRepeating("FightCreatures", randomStart, 1);
         InvokeRepeating("DefendOrRun", randomStart, 0.5f);
-        InvokeRepeating("EnemyBreed", randomStart, 0.5f);
+        InvokeRepeating("EnemyBreed", randomStart, 5);
         agent = gameObject.GetComponent<NavMeshAgent>();
         obstacle = gameObject.GetComponent<NavMeshObstacle>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -479,7 +479,8 @@ public class EnemiesAutonomousBehavior : MonoBehaviour
 
     void EnemyBreed()
     {
-        if (attributes.libido >= 200)
+        float randomValue = Random.value;
+        if (attributes.libido >= 200 && randomValue < 0.5)
         {
             GameObject activeCreature = GameObject.Find("Enemies" + globalAttributes.indice+ "/" + character).gameObject;
             
